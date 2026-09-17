@@ -505,16 +505,10 @@ def _(mo):
 @app.cell
 def _(freight_charges):
     under_25 = []
-    for charge in freight_charges:
-        if charge <= 25:
-            under_25.append(charge)
-    under_25
-    return
-
-
-@app.cell
-def _(freight_charges):
-    freight_charges[5]
+    for charges in freight_charges: 
+        if charges <= 25:
+            under_25.append(charges)
+    print(f"The items under 25 are ${under_25[0]}, ${under_25[1]}, ${under_25[2]},${under_25[3]} and they add up to ${sum(under_25)}.")
     return
 
 
@@ -556,6 +550,27 @@ def _(mo):
     return
 
 
+@app.cell
+def _():
+    import pandsa
+
+    return
+
+
+@app.cell
+def _():
+    open("sales.csv")
+    return
+
+
+app._unparsable_cell(
+    r"""
+    new_charges = [16.75, 22.25
+    """,
+    name="_"
+)
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -565,6 +580,12 @@ def _(mo):
 
     `max(["9.50", "16.75", "22.25"])`
     """)
+    return
+
+
+@app.cell
+def _():
+    max(["9.50", "16.75", "22.25"])
     return
 
 
