@@ -20,6 +20,11 @@ def _():
     return (mo,)
 
 
+@app.cell
+def _():
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -78,8 +83,97 @@ def _(mo):
 
 @app.cell
 def _():
-    # Your own example of each name.
+    cost = input('Enter the cost:')
+    tax = input('Enter the tax:')
+    return cost, tax
 
+
+@app.cell
+def _(cost):
+    cost * 2
+    return
+
+
+@app.cell
+def _(cost, tax):
+    total_cost = cost + tax
+    print(total_cost)
+
+    #print(f"The cost is ${cost:.2f}. Total is ${total_cost:.2f}")
+    # to show two decimal places, inside f string: {cost:.2f}
+    return
+
+
+@app.cell
+def _(cost, tax):
+    total_cost = float(cost) + float(tax)
+    print(total_cost)
+    return
+
+
+@app.cell
+def _(cost):
+    type(cost)
+    return
+
+
+@app.cell
+def _():
+    x = 4/3
+    type(x)
+    # one / gives you full division with decimals (float)
+    return (x,)
+
+
+@app.cell
+def _():
+    y = 4//3
+    type(y)
+    # two // gives you division without the decimal (int)
+    return
+
+
+@app.cell
+def _(x):
+    int(x)
+    return
+
+
+@app.cell
+def _():
+    freight_charges = [16.75, 22.25, 25.00, 18.50, 30.00, 12.99]
+    freight_charges[1:4]
+    return (freight_charges,)
+
+
+@app.cell
+def _(freight_charges):
+    for charge in freight_charges:
+        print(f"--- charge is now {charge} ---")
+        freight_tax = charge * 0.0625
+        print(f"freight_tax = {charge} * 0.0625 = {freight_tax:.4f}")
+        total_charge = charge + freight_tax
+        print(f"Total charge is ${total_charge:.2f}")
+    return
+
+
+@app.cell
+def _(freight_charges):
+    for charge_1 in freight_charges:
+        if charge_1 <= 25:
+            print(charge_1)
+    return
+
+
+@app.cell
+def _(freight_charges):
+    sorted(freight_charges)
+    return
+
+
+@app.cell
+def _():
+    # Your own example of each name.
     # 1. value:
     # 2. name and assignment:
     # 3. type:
@@ -225,11 +319,15 @@ def _(mo):
 @app.cell
 def _():
     score = 95
-    if score >= 60:
-        print("Pass")
-    elif score >= 90:
+    if score >= 90:
         print("A")
-    return (score,)
+    elif score>= 80:
+        print("B")
+    elif score >= 60:
+        print("Pass")
+    else:
+        print("Fail")
+    return
 
 
 @app.cell(hide_code=True)
@@ -256,7 +354,7 @@ def _(mo):
 def _():
     statuses = ["shipped", "pending", "shipped", "cancelled", "shipped"]
     statuses
-    return (statuses,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -285,7 +383,7 @@ def _():
     order_lines = ["notebook", "pen"]
     order_lines.append(["stapler", "tape"])
     len(order_lines)
-    return (order_lines,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -315,7 +413,7 @@ def _():
     print(sorted(tickers))
     print(tickers.sort())
     tickers
-    return (tickers,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -351,7 +449,7 @@ def _():
     sale_prices = prices
     sale_prices.append(4.99)
     prices
-    return (prices, sale_prices,)
+    return
 
 
 @app.cell(hide_code=True)
