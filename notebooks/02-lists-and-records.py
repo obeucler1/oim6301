@@ -20,11 +20,6 @@ def _():
     return (mo,)
 
 
-@app.cell
-def _():
-    return
-
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -89,25 +84,12 @@ def _():
 
 
 @app.cell
-def _(cost):
-    cost * 2
-    return
-
-
-@app.cell
 def _(cost, tax):
     total_cost = cost + tax
     print(total_cost)
 
     #print(f"The cost is ${cost:.2f}. Total is ${total_cost:.2f}")
     # to show two decimal places, inside f string: {cost:.2f}
-    return
-
-
-@app.cell
-def _(cost, tax):
-    total_cost = float(cost) + float(tax)
-    print(total_cost)
     return
 
 
@@ -122,7 +104,7 @@ def _():
     x = 4/3
     type(x)
     # one / gives you full division with decimals (float)
-    return (x,)
+    return
 
 
 @app.cell
@@ -134,46 +116,9 @@ def _():
 
 
 @app.cell
-def _(x):
-    int(x)
-    return
-
-
-@app.cell
-def _():
-    freight_charges = [16.75, 22.25, 25.00, 18.50, 30.00, 12.99]
-    freight_charges[1:4]
-    return (freight_charges,)
-
-
-@app.cell
-def _(freight_charges):
-    for charge in freight_charges:
-        print(f"--- charge is now {charge} ---")
-        freight_tax = charge * 0.0625
-        print(f"freight_tax = {charge} * 0.0625 = {freight_tax:.4f}")
-        total_charge = charge + freight_tax
-        print(f"Total charge is ${total_charge:.2f}")
-    return
-
-
-@app.cell
-def _(freight_charges):
-    for charge_1 in freight_charges:
-        if charge_1 <= 25:
-            print(charge_1)
-    return
-
-
-@app.cell
-def _(freight_charges):
-    sorted(freight_charges)
-    return
-
-
-@app.cell
 def _():
     # Your own example of each name.
+
     # 1. value:
     # 2. name and assignment:
     # 3. type:
@@ -284,12 +229,19 @@ def _(mo):
     own, added with the **+** button.
 
     **A ·**
+    I got Pass, A, then Pass. For the "Going Further" section I got A, Pass, Pass, Fail.
+
+    **B ·**
+    I got 3, 2, and 60.0
 
     **C ·**
+    Append adds two items, stapler and tape, into the 2nd item of order_lines. Extend() puts each item being added into a seperate item in order_lines.
 
     **D ·**
+    tickers.sort() printed None but sorted(tickers) printed a list because sorted() sorts and changes the list tickers and prints the new list, while .sort() also sorts the tickers list, but doesn't change the list itself.
 
     **E ·**
+    You would want two names to refer to the same list on purpose if you want the changes made to one variable to be made throughout the whole program.
     """)
     return
 
@@ -318,14 +270,12 @@ def _(mo):
 
 @app.cell
 def _():
-    score = 95
+    score = 55
     if score >= 90:
         print("A")
-    elif score>= 80:
-        print("B")
-    elif score >= 60:
+    elif score <= 90 and score >= 60:
         print("Pass")
-    else:
+    elif score < 60:
         print("Fail")
     return
 
@@ -354,6 +304,40 @@ def _(mo):
 def _():
     statuses = ["shipped", "pending", "shipped", "cancelled", "shipped"]
     statuses
+    return (statuses,)
+
+
+@app.cell
+def _(statuses):
+    counter = 0
+    for status in statuses: 
+        if status =='shipped':
+            counter += 1
+    print(counter)
+        
+    return
+
+
+@app.cell
+def _(statuses):
+    counter2 = 0
+    counter3 = 0
+    for status2 in statuses:
+        if status2 == 'shipped':
+            counter2 +=1
+        else: counter3 +=1
+    print(counter3)
+    return
+
+
+@app.cell
+def _(statuses):
+    counter4 = 0
+    for status3 in statuses:
+        if status3 == 'shipped':
+            counter4 +=1
+    print((counter4 / len(statuses)*100))
+    
     return
 
 
@@ -381,8 +365,28 @@ def _(mo):
 @app.cell
 def _():
     order_lines = ["notebook", "pen"]
-    order_lines.append(["stapler", "tape"])
+    order_lines.extend(["stapler", "tape"])
     len(order_lines)
+    return (order_lines,)
+
+
+@app.cell
+def _(order_lines):
+    order_lines
+    return
+
+
+@app.cell
+def _(order_lines):
+    order_lines[2]
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Append adds two items, stapler and tape, into the 2nd item of order_lines. Extend() puts each item being added into a seperate item in order_lines.
+    """)
     return
 
 
@@ -413,6 +417,21 @@ def _():
     print(sorted(tickers))
     print(tickers.sort())
     tickers
+    return (tickers,)
+
+
+@app.cell
+def _(tickers):
+    tix = sorted(tickers, reverse = True)
+    print(tix)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    tickers.sort() printed None but sorted(tickers) printed a list because sorted() sorts and changes the list tickers and prints the new list, while .sort() also sorts the tickers list, but doesn't change the list itself.
+    """)
     return
 
 
@@ -446,9 +465,23 @@ def _(mo):
 @app.cell
 def _():
     prices = [12.50, 8.00, 19.99]
-    sale_prices = prices
+    sale_prices = prices[:]
     sale_prices.append(4.99)
     prices
+    return prices, sale_prices
+
+
+@app.cell
+def _(prices, sale_prices):
+    prices is sale_prices 
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    You would want two names to refer to the same list on purpose if you want the changes made to one variable to be made throughout the whole program.
+    """)
     return
 
 
