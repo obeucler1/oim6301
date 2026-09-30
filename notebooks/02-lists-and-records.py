@@ -314,7 +314,7 @@ def _(statuses):
         if status =='shipped':
             counter += 1
     print(counter)
-        
+    
     return
 
 
@@ -337,7 +337,7 @@ def _(statuses):
         if status3 == 'shipped':
             counter4 +=1
     print((counter4 / len(statuses)*100))
-    
+
     return
 
 
@@ -680,6 +680,11 @@ def _(mo):
     **Going further.** Look at the three orders with no `ShippedDate`. What do they have
     in common that the other 27 do not? The answer is not about shipping.
     """)
+    return
+
+
+@app.cell
+def _():
     return
 
 
