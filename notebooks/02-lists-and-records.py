@@ -314,7 +314,7 @@ def _(statuses):
         if status =='shipped':
             counter += 1
     print(counter)
-    
+
     return
 
 
@@ -337,7 +337,6 @@ def _(statuses):
         if status3 == 'shipped':
             counter4 +=1
     print((counter4 / len(statuses)*100))
-
     return
 
 
@@ -684,7 +683,35 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(orders):
+    total = 0
+    for order in orders:
+        total = total + order["Freight"]
+    total
+    return
+
+
+@app.cell
+def _(orders):
+    total1 = 0
+    for order1 in orders: 
+        if order1["ShippedDate"] is None: 
+            total1 = total1 + 1
+    total1
+    return
+
+
+@app.cell
+def _(orders):
+    largest = 0
+    largest_order = None
+    for order2 in orders: 
+        if order2["Freight"] > largest:
+            largest = order2["Freight"]
+            largest_order = order2["OrderID"]
+    print(largest_order, largest)
+        
+    
     return
 
 
@@ -708,10 +735,9 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    *One row is ...*
+    *One row is the list of items that are associated with each other, with each column of the rows being part of the greater row. For example the first row in OrderID represents all the variables associated with that order.*
 
-    *(Replace this line with your own sentence. If this cell shows you code instead of
-    text, use the cell menu to turn it into a markdown cell.)*
+    *This table would have 30 rows because there are 30 OrderID values, which represent each individual order in the table*
     """)
     return
 
@@ -738,6 +764,15 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    1. For each holding, multiply the price of the holding by the number of shares for that specific holding, then add each of those totals to each other to get the cost to buy the whole portfolio
+    2. Agent said "For each holding, multiply its number of shares by its price, to get what that one holding costs. Then add all those costs together, one holding at a time, to get the total cost of the whole portfolio."
+    """)
+    return
+
+
 @app.cell
 def _():
     portfolio = [
@@ -749,6 +784,48 @@ def _():
         {"Symbol": "TSLA", "Shares": 150, "Price": 255.70},
     ]
     portfolio
+    return (portfolio,)
+
+
+@app.cell
+def _(portfolio):
+    # from the agent
+    total_cost = 0
+    for holding in portfolio:
+        holding_cost = holding["Shares"] * holding["Price"]
+        total_cost = total_cost + holding_cost
+    total_cost
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Similar problem: A small warehouse has a list of pending shipments. Each one is a record with a number of boxes and a cost per box.
+
+    What is the total shipping cost across all four shipments?
+    """)
+    return
+
+
+@app.cell
+def _():
+    shipments = [
+        {"Destination": "Chicago", "Boxes": 40, "CostPerBox": 2.25},
+        {"Destination": "Denver", "Boxes": 15, "CostPerBox": 3.10},
+        {"Destination": "Austin", "Boxes": 60, "CostPerBox": 1.75},
+        {"Destination": "Boston", "Boxes": 25, "CostPerBox": 2.90},
+    ]
+    return (shipments,)
+
+
+@app.cell
+def _(shipments):
+    totalcost = 0
+    for ship in shipments:
+        ship_cost = ship["CostPerBox"] * ship["Boxes"]
+        totalcost = ship_cost + totalcost
+    totalcost
     return
 
 
@@ -800,6 +877,28 @@ def _(mo):
         _where = f"could not write into {_data_dir.name}/: {_error}"
 
     _where
+    return
+
+
+@app.cell
+def _(mo):
+    file_path = mo.notebook_dir().parent / "data" / "portfolio.csv"
+    file = open(file_path)
+    lines = file.readlines()
+    lines
+    return (lines,)
+
+
+@app.cell
+def _(lines):
+    # Agent helped me
+    totaldata = 0
+    for data in lines[1:]:
+        parts = data.split(",")
+        shares = float(parts[1])
+        price = float(parts[2])
+        totaldata = totaldata + (shares * price)
+    totaldata
     return
 
 
