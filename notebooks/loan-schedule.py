@@ -32,6 +32,24 @@ def _(mo):
     return
 
 
+@app.cell
+def _():
+    loan_amount = 400000
+    annual_rates = {30: 0.0703, 15: 0.0642}
+    # r = annual rate of the term, n = number of months
+    rThirty = 0.0703 / 12
+    nThirty = 12 * 30
+    range(1, nThirty + 1) 
+    # loan_amount * rThirty / (1 - (1 + rThirty) ** -nThirty)
+
+    return
+
+
+@app.cell
+def _():
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
