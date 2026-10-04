@@ -78,6 +78,8 @@ def _(mo):
 
     My loop would carry the monthly loan percentage through each month to see how much the buyer would pay each month, along with the total amount they would pay once they've paid the full mortgage.
 
+    To check this, I would compare the final amount paid against the expected amount paid based on the loan amount and the interest rate per month.
+
     *Commit this notebook with the message `mp1: plan before AI`.*
     """)
     return
