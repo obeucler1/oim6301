@@ -157,13 +157,17 @@ def _(mo):
 
     Several questions below ask for a sentence. This cell is where they go. Click into it, write under the letter, and press `Ctrl+Enter` (Windows) or `Cmd+Enter` (macOS).
 
-    **B France, Germany, Brazil, and the USA had 4·**
+    **B·** France, Germany, Brazil, and the USA had 4
 
-    **C ·**
+    **C·**
+        1. This would be a list because it keeps the values in order but can be changed.
+        2. This would be a set because it keeps each customer once but in no particular order.
+        3. This would be a dictionary because holds values with keys, so the units sold would be the value and product name would be the key.
+        4. This would be a tuple because it has a fixed value and cannot be changed once recorded.
 
-    **D ·**
+    **D ·** For this question, I would prefer it in a dictionary because it is easier to differentiate what the two values are next to the company with the key.
 
-    **G ·**
+    **G ·** For each ticker, you add up the past shares bought of that particular ticker and subtract the shares of that ticker sold.
     """)
     return
 
@@ -399,7 +403,7 @@ def _(mo):
 @app.cell
 def _(traded_tickers):
     portfolio_tickers = {"AAPL", "MSFT", "GOOG", "AMZN", "NVDA", "TSLA"}
-    sorted(portfolio_tickers & traded_tickers), sorted(portfolio_tickers - traded_tickers)
+    sorted(portfolio_tickers & traded_tickers), sorted(portfolio_tickers - traded_tickers) , sorted(portfolio_tickers | traded_tickers)
     return
 
 
@@ -475,6 +479,30 @@ def _():
         ("TSLA", 150, 255.70),
     ]
     holdings
+    return (holdings,)
+
+
+@app.cell
+def _(holdings):
+    total = 0
+    for _symbol, _shares, _price in holdings: 
+        hold = _shares * _price
+        total = total + hold
+    print(total)
+    
+    return
+
+
+@app.cell
+def _(holdings):
+    #Agent's answer
+
+    portfolio_cost = 0
+    for _symbol, _shares, _price in holdings:
+        portfolio_cost = portfolio_cost + (_shares * _price)
+
+    portfolio_cost = round(portfolio_cost, 2)
+    print(f"The whole portfolio costs ${portfolio_cost}")
     return
 
 
@@ -507,6 +535,40 @@ def _():
         ("2026-08-12", "AAPL", "sell", 40, 250.00),
     ]
     year_trades
+    return (year_trades,)
+
+
+@app.cell
+def _(year_trades):
+    # For each ticker, lots["AAPL"] is a list of (shares, price) lots still held,
+    # oldest first. A buy adds a new lot to the end. A sale eats into the
+    # oldest lots first (FIFO) until enough shares are found, tracking the gain.
+
+    lots = {}
+    gains = {}
+
+    for _date, _ticker, _action, _shares, _price in year_trades:
+        if _ticker not in lots:
+            lots[_ticker] = []
+            gains[_ticker] = 0
+
+        if _action == "buy":
+            lots[_ticker].append([_shares, _price])
+        else:
+            _shares_left = _shares
+            while _shares_left > 0:
+                _lot = lots[_ticker][0]
+                _lot_shares, _lot_price = _lot[0], _lot[1]
+                if _lot_shares <= _shares_left:
+                    gains[_ticker] = gains[_ticker] + _lot_shares * (_price - _lot_price)
+                    _shares_left = _shares_left - _lot_shares
+                    lots[_ticker].pop(0)
+                else:
+                    gains[_ticker] = gains[_ticker] + _shares_left * (_price - _lot_price)
+                    _lot[0] = _lot_shares - _shares_left
+                    _shares_left = 0
+
+    lots, gains
     return
 
 
@@ -544,6 +606,7 @@ def _(requests):
         "&temperature_unit=fahrenheit&wind_speed_unit=mph"
         "&timezone=America/New_York"
     )
+    print(babson_url)
     babson_reply = requests.get(babson_url, timeout=10)
     babson_reply.status_code
     return (babson_reply,)
@@ -669,11 +732,32 @@ def _(mo):
     return
 
 
+@app.cell
+def _(babson_weather):
+    units = babson_weather["current_units"]["wind_speed_10m"]
+
+    print(f"The windspeed at Babson is {babson_weather["current"]["wind_speed_10m"]} {units}.")
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     **F · Another town.** Search for `Wellesley` the way the misspelled search did, with the correct spelling. Take the first place out of `results`, then its `latitude`, `longitude` and `admin1`. *Check yourself: latitude 42.29649, in Massachusetts.*
     """)
+    return
+
+
+@app.cell
+def _(requests):
+    spelled_reply = requests.get(
+        "https://geocoding-api.open-meteo.com/v1/search?name=Wellesley&count=1",
+        timeout=10,
+    )
+    spelled_reply.status_code, spelled_reply.json()
+    spelling = spelled_reply.json()
+
+    print(f"The longitude and latitude in Wellesley, MA is {spelling["results"][0]["longitude"]}, {spelling["results"][0]["latitude"]} , and the admin1 is {spelling["results"][0]["admin1_id"]}.")
     return
 
 
@@ -684,6 +768,11 @@ def _(mo):
 
     **Going further.** Use F's coordinates to ask for Wellesley's current temperature. Build the address with an f-string, so that changing the town changes the forecast.
     """)
+    return
+
+
+@app.cell
+def _():
     return
 
 
