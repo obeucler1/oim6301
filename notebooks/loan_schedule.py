@@ -37,9 +37,6 @@ def _(mo):
     mo.md(r"""
     ## 1. The Question
 
-    *Who would use this, and what decision does it help them make? Two or three sentences, in words somebody outside this course would understand.*
-
-
     A person who would use this would be someone that wants to buy an apartment or home and is trying to figure out how many years to pay off their loans. We could also use this for cars or other assets that have loans associated with them.
     """)
     return
@@ -50,10 +47,6 @@ def _(mo):
     mo.md(r"""
     ## 2. My Plan Before AI
 
-    *Before you ask your agent anything, write how you would solve it: the steps, in order, in plain words, in five lines or more. Then answer these two questions:*
-
-    - *What does your loop carry from one step to the next, the way a running total carries its sum?*
-    - *Which check will you use in section 6, and which two numbers should agree?*
 
     My loop would carry the monthly loan percentage through each month to see how much the buyer would pay each month, along with the total amount they would pay once they've paid the full mortgage.
 
@@ -195,9 +188,26 @@ def _(mo):
 
 
 @app.cell
+def _(sched30):
+    print("30-year loan schedule:")
+    print(f"{'month':>5} {'payment':>10} {'interest':>10} {'principal':>10} {'balance':>12}")
+    for _row in sched30:
+        print(f"{_row['month']:>5} {_row['payment']:>10,.2f} {_row['interest']:>10,.2f} {_row['principal']:>10,.2f} {_row['balance']:>12,.2f}")
+    return
+
+
+@app.cell
+def _(sched15):
+    print("15-year loan schedule:")
+    print(f"{'month':>5} {'payment':>10} {'interest':>10} {'principal':>10} {'balance':>12}")
+    for _row15 in sched15:
+        print(f"{_row15['month']:>5} {_row15['payment']:>10,.2f} {_row15['interest']:>10,.2f} {_row15['principal']:>10,.2f} {_row15['balance']:>12,.2f}")
+    return
+
+
+@app.cell
 def _(loan15, loan30, totalInt, totalInt15):
-    print(f"30-year: payment ${loan30}, total interest: ${totalInt}")
-    print(f"15-year: payment ${loan15}, total interest: ${totalInt15}")
+    print(f"For someone who is buying a house or apartment, if they have $40,000 in mortgages to pay and are trying to choose between the 30-year (payment ${loan30:,.2f}, total interest: ${totalInt:,.2f} and the 15-year (payment ${loan15:,.2f}, total interest: ${totalInt15:,.2f}) I would have them choose the 15 year payment, even if it is more money per month.")
     return
 
 
@@ -230,10 +240,6 @@ def _(mo):
     mo.md(r"""
     ## 7. Working With the Agent
 
-    *Pick one piece of AI output you did not accept as-is. What did it give you, what did you change, and how did you know? Point to the commit or the cell.*
-
-    *If the agent got it right the first time: what did you do to verify that?*
-
     I asked my agent to double check the schedule data, and it says that it accidentally wrote "if _principal > balance:" which is not true in this problem since we wanted it to stop at zero, not to stop only if it was overpaid. My agent then adjusted the line to "if _m == nThirty or _principal >= balance:" which then made sure the last row of each schedule ended at 0.
     """)
     return
@@ -243,8 +249,6 @@ def _(mo):
 def _(mo):
     mo.md(r"""
     ## 8. Going Further
-
-    *Take at least one step past the main task, in any direction, and use your agent as much as you like. It does not have to work. State what you tried, what you found, and where it is in this notebook.*
 
     I am going to solve "Pay an extra $200 every month. How many months, and how much interest, does that save on each loan?"
     """)
