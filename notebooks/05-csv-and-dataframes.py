@@ -12,7 +12,7 @@
 
 import marimo
 
-__generated_with = "0.25.1"
+__generated_with = "0.24.2"
 app = marimo.App(width="medium", sql_output="polars")
 
 
@@ -197,6 +197,21 @@ def _(mo):
     return
 
 
+@app.cell
+def _(towns_from_file):
+    count = {}
+
+    for town in towns_from_file:
+        if int(town["average_single_family_bill_dollars"]) > 10000:
+          county = town["county"]
+          if county in count:   
+              count[county] += 1
+          else:
+              count[county] = 1
+    print(count)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -266,6 +281,26 @@ def _(mo):
     return
 
 
+@app.cell
+def _(pl, town_table):
+    (
+        town_table.group_by("county")
+        .agg(pl.len().alias("towns"))
+        .sort("towns", descending=True)
+    )
+    return
+
+
+@app.cell
+def _(pl, town_table):
+    (
+        town_table.filter(pl.col("population") > 50_000)
+        .sort("average_single_family_bill_dollars", descending= True)
+        .head(5)
+    )
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -315,6 +350,28 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    I would predict that some of the lower count counties on the list may go down, if they are in an area where 10000 is the highest average bill in the area. I do not think any would go up because the threshold is saying "anything above 10000" which includes 15000.
+    """)
+    return
+
+
+@app.cell
+def _(mo, town_table):
+    _df = mo.sql(
+        f"""
+        SELECT county, COUNT(*) AS towns
+        FROM town_table
+        WHERE average_single_family_bill_dollars > 15000
+        GROUP BY county
+        ORDER BY towns DESC
+        """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     # 4. The First Chart
 
     Draw the answer. `.plot.bar()` on a DataFrame draws one bar per row, with a library called **altair**. `alt.X()` and `alt.Y()` name each axis's column and give it a title a reader can understand, and `.properties(title=...)` states what the chart shows. `sort="-y"` puts the tallest bar first.
@@ -355,6 +412,32 @@ def _(mo):
 
     **Going further.** Color the bars or dots by a column with `color=`, and say what the colors add.
     """)
+    return
+
+
+@app.cell
+def _(mo, town_table):
+    towns_over_population = mo.sql(
+        f"""
+        SELECT county, COUNT(*) AS towns
+        FROM town_table
+        WHERE population > 50000
+        GROUP BY county
+        ORDER BY towns DESC
+        """
+    )
+    return (towns_over_population,)
+
+
+@app.cell
+def _(alt, mo, towns_over_population):
+    towns_over_population_chart = mo.ui.altair_chart(
+        towns_over_population.plot.bar(
+            x=alt.X("county", sort="-y", title="County"),
+            y=alt.Y("towns", title="Towns with a population over the threshold"),
+        ).properties(title="Middlesex has the most towns with populations over 50,000")
+    )
+    towns_over_population_chart
     return
 
 
