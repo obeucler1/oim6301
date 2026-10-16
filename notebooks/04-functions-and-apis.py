@@ -380,6 +380,32 @@ def _(mo):
     return
 
 
+@app.cell
+def _(max_bill, name, requests):
+    def get_income(income):
+        zhili_reply = requests.get(
+            "https://oim.zhili.dev/docs#/default/towns_ma_towns_get",
+            params={"name": name, "max_bill": 5},
+            timeout=10,)
+        place = zhili_reply.json()["max_bill"][0]
+
+        income_reply = requests.get(
+            "https://oim.zhili.dev/docs#/default/towns_ma_towns_get/ma/towns",
+            params={
+                "name": name,
+                "max_bill": max_bill,},
+            timeout=10,)
+        return income_reply.json()["max_bill"]
+
+    return (get_income,)
+
+
+@app.cell
+def _(get_income):
+    get_income("income")
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
