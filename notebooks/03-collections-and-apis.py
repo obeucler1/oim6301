@@ -167,7 +167,7 @@ def _(mo):
 
     **D ·** For this question, I would prefer it in a dictionary because it is easier to differentiate what the two values are next to the company with the key.
 
-    **G ·** For each ticker, you add up the past shares bought of that particular ticker and subtract the shares of that ticker sold.
+    **G ·** The first result is Babson Park in Florida, and the second result is Babson Park in Massachussettes. This means that the [0] item is Babson Park in Florida, so if we had a code that automatically took the zero ith item it would give us the Babson Park in Florida, which is not the Babson Park we are interested in.
     """)
     return
 
@@ -216,6 +216,28 @@ def _(closing_prices):
     # to see None as an output (based on my agents advice), print the statement
     print(closing_prices.get("TSLA"))
     return
+
+
+@app.cell
+def _(closing_prices, price):
+    high = []
+    for _ticker, _price in closing_prices.items():
+        if price > 200:
+            high.append(_ticker)
+    high
+    return
+
+
+@app.cell
+def _(closing_prices):
+    highest_price = 0
+    highest_ticker = None
+    for ticker, price in closing_prices.items():
+        if price > highest_price:
+            highest_price = price
+            highest_ticker = ticker
+    highest_ticker
+    return (price,)
 
 
 @app.cell(hide_code=True)
@@ -489,7 +511,7 @@ def _(holdings):
         hold = _shares * _price
         total = total + hold
     print(total)
-    
+
     return
 
 
@@ -772,7 +794,15 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(requests):
+    babpark_reply = requests.get(
+        "https://geocoding-api.open-meteo.com/v1/search",
+        params={"name": "Babson Park"},
+        timeout=10,
+    )
+    babpark_reply.status_code, babpark_reply.json()
+    babpark = babpark_reply.json()
+    print(babpark["results"])
     return
 
 
