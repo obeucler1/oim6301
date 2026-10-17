@@ -193,12 +193,79 @@ def _(mo):
     return
 
 
+@app.function
+def count_shares(portfolio):
+    total = 0
+    for ticker, shares, cost in portfolio:
+        total = total + int(shares)
+    return total
+
+
+@app.cell
+def _(holdings):
+    count_shares(holdings)
+    return
+
+
+@app.cell
+def _(retirement_holdings):
+    count_shares(retirement_holdings)
+    return
+
+
+@app.function
+def find_largest(portfolio):
+    total = 0
+    largest_ticker = None
+    for ticker, shares, cost in portfolio:
+        totaltix = shares * cost
+        if totaltix > total:
+            total = totaltix
+            largest_ticker = ticker
+
+    return (largest_ticker, total)
+
+
+@app.cell
+def _(holdings):
+    find_largest(holdings)
+    return
+
+
+@app.cell
+def _(retirement_holdings):
+    find_largest(retirement_holdings)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     ## ✏️ B · Without `return`
 
     Copy `count_shares` into a new cell under a new name, and put `print(...)` where the `return` was. Call it and keep the result in a name. In a markdown cell under it, answer: what does that name hold, and what could the next cell do with it?
+    """)
+    return
+
+
+@app.function
+def count_shares1(portfolio):
+    total = 0
+    for ticker, shares, cost in portfolio:
+        total = total + int(shares)
+    print(total)
+
+
+@app.cell
+def _(holdings):
+    no_return = count_shares1(holdings)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The name spits out 600 from the shares, but is not actually holding anything. A return stores the value it is asked for, but print()  just prints out whatever the function is asked without storing anything. The 600 value is visible to us, but the computer does not have it stored anywhere. So no_return technically holds nothing.
     """)
     return
 
@@ -381,28 +448,31 @@ def _(mo):
 
 
 @app.cell
-def _(max_bill, name, requests):
-    def get_income(income):
-        zhili_reply = requests.get(
-            "https://oim.zhili.dev/docs#/default/towns_ma_towns_get",
-            params={"name": name, "max_bill": 5},
-            timeout=10,)
-        place = zhili_reply.json()["max_bill"][0]
-
-        income_reply = requests.get(
-            "https://oim.zhili.dev/docs#/default/towns_ma_towns_get/ma/towns",
+def _(requests):
+    def get_top_income_towns(county, count):
+        towns_reply = requests.get(
+            "https://oim.zhili.dev/ma/towns",
             params={
-                "name": name,
-                "max_bill": max_bill,},
-            timeout=10,)
-        return income_reply.json()["max_bill"]
+                "county": county,
+                "sort": "income",
+                "order": "desc",
+                "per_page": count,
+            },
+            timeout=10,
+        )
+        return towns_reply.json()["items"]
 
-    return (get_income,)
+    return (get_top_income_towns,)
 
 
 @app.cell
-def _(get_income):
-    get_income("income")
+def _(get_top_income_towns):
+    top_norfolk_income = get_top_income_towns("Norfolk", 5)
+
+    town_names = []
+    for _town in top_norfolk_income:
+        town_names.append(_town["name"])
+    town_names
     return
 
 
@@ -419,6 +489,38 @@ def _(mo):
 
     **Going further.** Write `town_history(name)`, which takes a town's name, makes both requests, and returns the history.
     """)
+    return
+
+
+@app.cell
+def _(requests):
+    wellesley_reply = requests.get(
+        "https://oim.zhili.dev/ma/towns",
+        params={"name": "Wellesley"},
+        timeout=10,
+    )
+    wellesley_town = wellesley_reply.json()["items"][0]
+    wellesley_dor_code = wellesley_town["dor_code"]
+    wellesley_dor_code
+
+    return (wellesley_dor_code,)
+
+
+@app.cell
+def _(requests, wellesley_dor_code):
+    wellesley_history_reply = requests.get(
+        f"https://oim.zhili.dev/ma/towns/{wellesley_dor_code}/history",
+        params={"from_year": 2026, "to_year": 2026},
+        timeout=10,
+    )
+    wellesley_history = wellesley_history_reply.json()
+    wellesley_history
+    return
+
+
+@app.cell
+def _():
+    (2020758 * 10.17) / 1000
     return
 
 
@@ -503,6 +605,30 @@ def _(mo):
     return
 
 
+@app.cell
+def _(get_page):
+    def get_all_towns():
+        first_page = get_page(1)
+        all_towns = first_page["items"]
+        pages = first_page["pagination"]["pages"]
+
+        for page in range(2, pages + 1):
+            next_page = get_page(page)
+            for town in next_page["items"]:
+                all_towns.append(town)
+
+        return all_towns
+
+    return (get_all_towns,)
+
+
+@app.cell
+def _(get_all_towns):
+    all_towns = get_all_towns()
+    len(all_towns), all_towns[0]["name"] , all_towns[-1]["name"]
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -548,6 +674,53 @@ def _(mo):
     3. Delete the `headers=` line and run it again. In a markdown cell under it, answer: what did the server answer, and why does it need to know who sent a message?
 
     **Going further.** Post something more useful than one town's bill: choose a question somebody would ask, answer it from live data, and post the answer, in 140 characters or fewer.
+    """)
+    return
+
+
+@app.cell
+def _(requests):
+    camb_reply = requests.get(
+        "https://oim.zhili.dev/ma/towns",
+        params={"name": "Cambridge"},
+        timeout=10,)
+
+    camb_town = camb_reply.json()["items"][0]
+    town_name = camb_town["name"]
+
+    town_bill = camb_town["average_single_family_bill_dollars"]
+
+    town_name, town_bill
+    return town_bill, town_name
+
+
+@app.cell
+def _(requests, town_bill, town_name):
+    board_reply = requests.post(
+        "https://oim.zhili.dev/message",
+        headers={"x-token": "obeucler1"},
+        json={"message": f"{town_name}: ${town_bill:,}"},
+        timeout=10,
+    )
+    board_reply.status_code, board_reply.json()
+    return
+
+
+@app.cell
+def _(requests, town_bill, town_name):
+    board_reply_error = requests.post(
+        "https://oim.zhili.dev/message",
+        json={"message": f"{town_name}: ${town_bill:,}"},
+        timeout=10,
+    )
+    board_reply_error.status_code, board_reply_error.json()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The server answered 401, 'detail":"Missing x-token header"' which tells us that the server isi missing important information, specifically, the x-token header, which tells it where to send the request to. The server needs to know where to send it to because this code gives it a message to say, but we never specify where to say the message so it send us back an error and asks for clarification.
     """)
     return
 
