@@ -16,6 +16,9 @@ def _(mo):
     mo.md(r"""
     ## The Question:
     Who would use this, and what decision does it help them make? (Two or three sentences, in words somebody outside this course would understand.)
+
+
+    Someone who would use this would be a buyer that is looking at houses to buy in the Middlesex county, and wants to only look at houses below a specific property tax.
     """)
     return
 
@@ -35,6 +38,16 @@ def _(mo):
     4. Which check will you use in section 6, and which two numbers should agree?
 
     **Commit with the message mp2: plan before AI.**
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    First I would write the get() function for the csv file of the API's Massachussetes data from state's Division of Local Services so it is connected to this notebook. Then I would examine the dataset so I would use def function to be able to write a cell that will get the information I ask from the dataset. After that, I would write a for loop that takes only the county, town, and budgets and assign the column names to a variable then using that, create the csv file. After that, I would be able to write a for loop that grabs each town in the Middlesex county within that tax range. Then I would make the for loop county and budget be interactive for the user to input their own county and budget range if they want to look somewhere else.
+
+    1. My tool will need the get() function to get the information from the API, then the def function to get the county and budgets using its parameters, then ill need to a for loop to go through each town in the dataset and then the functions for creating the csv. I would also need the pl.read_csv to look at the csv and then .sort() to sort it in decending order by cheapest bill.
     """)
     return
 
@@ -140,6 +153,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+ 
     """)
     return
 
