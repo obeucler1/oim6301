@@ -136,7 +136,6 @@ def _(mo):
 @app.cell
 def _(requests):
     def get_town_history(dor_code, fiscal_year): 
-        """Returns one town's finances for one fiscal year, or None if there is no record for that year.""" 
         history_reply = requests.get( 
             f"https://oim.zhili.dev/ma/towns/{dor_code}/history", 
             params={"from_year": fiscal_year, "to_year": fiscal_year}, 
@@ -201,7 +200,7 @@ def _(mo):
 def _(matchTownsSort):
     for towns in matchTownsSort:
         print(f"{towns["town"]:<15}Avg Home Value: {towns["average home value"]:>7}       Residential Tax Rate: {towns["residential tax rate"]:>6}             Avg Bill: {towns["average bill"]:>5}")
-    
+
     return
 
 
@@ -229,7 +228,7 @@ def _(requests):
             "https://oim.zhili.dev/ma/towns", 
             params={"county": county, "per_page": 100}, 
             timeout=10,).json() 
-        
+    
         towns = first_reply["items"] 
         for town in towns:
             if town["name"] == name:
@@ -242,7 +241,6 @@ def _(requests):
 @app.cell
 def _(get_towns_check):
     get_towns_check('Middlesex', 'Malden')
-
 
     return
 
@@ -276,15 +274,18 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Working With the Agent.
+    ## 7. Working With the Agent.
 
     Pick one piece of AI output you did not accept as-is. What did it give you, what did you change, and how did you know? Point to the commit or the cell. If the agent got it right the first time: What did you do to verify that? Pointing to your check in section 6 is enough.
     """)
     return
 
 
-@app.cell
-def _():
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    In the first cell in my "Inputs" section, I had inputted the values given to us in the directions (county = "Middlesex", budget_dollars = 700000, tax_limit_dollars = 8000, fiscal_year = 2026). As I was going through the next sections, I remembered that we had to make the code able to have the county and budget numbers changed if needed. I tried it myself, but ultimately asked my agent to help. My agent changed all 4 variables (county, budget_dollars, tax_limit_dollars, and fiscal_year) to inputs. I thought this was a good idea in theory, but the directions stated we only needed budget and county to be inputs. I then overrided my Agents code for tax_limit_dollars and fiscal_year to stay as fixed numbers of 8000 and 2026.
+    """)
     return
 
 
@@ -302,6 +303,14 @@ def _(mo):
     Write what you expect to change in the answer.
 
     **Commit with the message mp2: prediction**, make the change, run it, and write what happened and whether it matched.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    My agent helped me write the first cell in the Inputs section.
     """)
     return
 
