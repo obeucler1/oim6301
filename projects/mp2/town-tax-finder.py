@@ -200,7 +200,6 @@ def _(mo):
 def _(matchTownsSort):
     for towns in matchTownsSort:
         print(f"{towns["town"]:<15}Avg Home Value: {towns["average home value"]:>7}       Residential Tax Rate: {towns["residential tax rate"]:>6}             Avg Bill: {towns["average bill"]:>5}")
-
     return
 
 
@@ -228,7 +227,7 @@ def _(requests):
             "https://oim.zhili.dev/ma/towns", 
             params={"county": county, "per_page": 100}, 
             timeout=10,).json() 
-    
+
         towns = first_reply["items"] 
         for town in towns:
             if town["name"] == name:
@@ -241,7 +240,6 @@ def _(requests):
 @app.cell
 def _(get_towns_check):
     get_towns_check('Middlesex', 'Malden')
-
     return
 
 
@@ -310,7 +308,11 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    My agent helped me write the first cell in the Inputs section.
+    Function 1: My agent helped me write the first cell in the Inputs section. The first line is an input line, that starts with the name Middlesex, but the user is able to change the name is whatever county they would like, and the label of the input is "County" so the user knows what the input is asking for. The budget_input line does the same thing but with the budget, and says "Max average home value ($)" so the user knows they can input the maximum average home value they are looking for. The next two lines are fixed variables that do not change. mo.vstack() takes the county_input and budget_input lines and displays them vertically so the user can see both in the output. The lines I had asked about were how to make the inputs adjustable for the user.
+    If I were to change one thing in this it would be to make the tax_limit_dollars line adjustable too. This way, the user can also find a home in their desired tax bracket as well. When I change this, I expect the tax_limit_dollars line to show up underneath the budget_input line and have the ability to be adjusted by the user.
+
+    Function 2: My agent also helped me write the get_towns(county) function. This function uses the API to look at the parameter "county" and then indexes to the "items" part and gets the pages I asked for, with a limit of 100 records per page. Then, the for loop goes through all the pages after the first page and loops through the API again until it gets all the towns. Then, inside that for loop, there is another for loop that takes all the items it has recieved and appends them together into "town" and returns the list. The lines I had asked about were what exactly the ["pagination"] variable does, to which my agent told me that it helps recieve the information in smaller chunks, in ["pages"] opposed to having everything at once.
+    If I were to change one thing in this, it would be to change "county" to "population". I would expect then that the user could see if the towns in the county they are interested in is a highly populated town or not.
     """)
     return
 
