@@ -77,7 +77,7 @@ def _(mo):
 def _(requests):
     ma_counties = requests.get("https://oim.zhili.dev/ma/counties", timeout=10).json()
     ma_counties[0], len(ma_counties)
-    return (ma_counties,)
+    return
 
 
 @app.cell(hide_code=True)
@@ -98,17 +98,19 @@ def _(requests):
         )
         return towns_reply.json()["items"]
 
-    return (get_towns,)
+    return
 
 
-@app.cell
-def _(get_towns, ma_counties):
+app._unparsable_cell(
+    r"""
     ma_towns = []
     for _county in ma_counties:
         for _town in get_towns(_county["name"]):
             ma_towns.append(_town)
-    len(ma_towns)
-    return (ma_towns,)
+    len(ma_towns
+    """,
+    name="_"
+)
 
 
 @app.cell(hide_code=True)
