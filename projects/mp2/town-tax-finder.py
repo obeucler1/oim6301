@@ -290,7 +290,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Reading It Back.
+    ## 8. Reading It Back.
 
     Pick two functions in your notebook that your agent wrote or helped write.
 
@@ -312,7 +312,60 @@ def _(mo):
     If I were to change one thing in this it would be to make the tax_limit_dollars line adjustable too. This way, the user can also find a home in their desired tax bracket as well. When I change this, I expect the tax_limit_dollars line to show up underneath the budget_input line and have the ability to be adjusted by the user.
 
     Function 2: My agent also helped me write the get_towns(county) function. This function uses the API to look at the parameter "county" and then indexes to the "items" part and gets the pages I asked for, with a limit of 100 records per page. Then, the for loop goes through all the pages after the first page and loops through the API again until it gets all the towns. Then, inside that for loop, there is another for loop that takes all the items it has recieved and appends them together into "town" and returns the list. The lines I had asked about were what exactly the ["pagination"] variable does, to which my agent told me that it helps recieve the information in smaller chunks, in ["pages"] opposed to having everything at once.
-    If I were to change one thing in this, it would be to change "county" to "population". I would expect then that the user could see if the towns in the county they are interested in is a highly populated town or not.
+    If I were to change one thing in this, it would be to change "county" to "town". I would expect then that the user could see information about the specific town they are interested in.
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    county_input2 = mo.ui.text(value="Middlesex", label="County")
+    budget_input2 = mo.ui.number(value=700000, label="Max average home value ($)")
+    tax_limit_dollars2 = mo.ui.number(value = 8000, label = "Desired Tax Limit ($)") 
+    fiscal_year2 = 2026 
+    mo.vstack([county_input2, budget_input2, tax_limit_dollars2])
+    return
+
+
+@app.cell
+def _(mo):
+    town_input = mo.ui.text(value="Acton", label="Town")
+    return
+
+
+@app.cell
+def _(requests):
+    def get_towns2(name): 
+        first_reply = requests.get( 
+            "https://oim.zhili.dev/ma/towns", 
+            params={"name": name, "per_page": 100}, 
+            timeout=10,).json() 
+        towns = first_reply["items"] 
+        pages = first_reply["pagination"]["pages"] 
+
+        for page in range(2, pages + 1): 
+            page_reply = requests.get( 
+                "https://oim.zhili.dev/ma/towns", 
+                params={"name": name, "per_page": 100, "page": page}, 
+                timeout=10, 
+            ).json() 
+            for town in page_reply["items"]: 
+                towns.append(town) 
+        return towns 
+
+    return (get_towns2,)
+
+
+@app.cell
+def _(get_towns2):
+    get_towns2("Acton")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Both of my changes matched what I predicted previously.
     """)
     return
 
@@ -320,17 +373,38 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ##Going Further.
+    ## 9. Going Further.
 
     What you tried past the main task, what you found, and where it is in the notebook.
 
-    examples:
+    Rank the same towns by tax rate in place of the bill. Does the order change, and why?
+    """)
+    return
 
-    - Add a second API. Bring in data from a second API and combine it with the first in whatever way makes your answer better or more interesting.
-    - Let somebody use it without editing code. A marimo notebook also runs as a script, uv run python projects/mp2/<your-tool>.py. Ask for the inputs with input(), take them from the command line, or give them controls and open the notebook with uv run marimo run.
-    - Put a model inside your tool. Write a function that sends the numbers your tool found to a model, with your Babson key, and returns the paragraph the model writes for your user. A paragraph you get from the chat panel or from your agent does not count. This one comes from your code each time the tool runs, so it changes when the data does.
-    - Run it on a schedule. GitHub Actions can rerun the notebook every day or every week, with any key stored as a repository secret.
-    - Keep what each run found, and use that history to answer something a single run cannot.
+
+@app.function
+def get_tax(town):
+    return town["residential tax rate"]
+
+
+@app.cell
+def _(matchingTowns):
+    matchTaxTownsSort = sorted(matchingTowns, key=get_tax)
+    matchTaxTownsSort
+    return (matchTaxTownsSort,)
+
+
+@app.cell
+def _(matchTaxTownsSort):
+    for townsTax in matchTaxTownsSort:
+        print(f"{townsTax["town"]:<15}       Residential Tax Rate: {townsTax["residential tax rate"]:>6}")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Yes, the order does change because the towns with the lowest average bill do not necessarily have the lowest tax rates. Malden has the lowest average bill, but Dracut has the lowest residential tax rate.
     """)
     return
 
@@ -338,9 +412,17 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Time Spent.
+    ## 10. Time Spent.
 
     About how many hours this project took you outside class, as one number. It is not graded.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    7 hours
     """)
     return
 
