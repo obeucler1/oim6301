@@ -25,7 +25,7 @@ def _():
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The Question:
+    ## 1. The Question:
     Who would use this, and what decision does it help them make? (Two or three sentences, in words somebody outside this course would understand.)
 
 
@@ -37,7 +37,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ##My Plan Before AI.
+    ## 2. My Plan Before AI.
     Before you ask your agent anything, open the API's address in your browser and read what comes back. Then write how you would solve it: the steps, in order, in plain words, in five lines or more. Then answer these:
 
     1. Which functions will your tool need? For each, what goes in and what comes out?
@@ -69,7 +69,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## Inputs.
+    ## 3. Inputs.
 
     Every input in one cell.
     """)
@@ -77,12 +77,20 @@ def _(mo):
 
 
 @app.cell
-def _():
-    county = "Middlesex" 
-    budget_dollars = 700000 
+def _(mo):
+    county_input = mo.ui.text(value="Middlesex", label="County")
+    budget_input = mo.ui.number(value=700000, label="Max average home value ($)")
     tax_limit_dollars = 8000 
     fiscal_year = 2026 
-    return budget_dollars, county, fiscal_year, tax_limit_dollars
+    mo.vstack([county_input, budget_input])
+    return budget_input, county_input, fiscal_year, tax_limit_dollars
+
+
+@app.cell
+def _(budget_input, county_input):
+    county = county_input.value
+    budget_dollars = budget_input.value
+    return budget_dollars, county
 
 
 @app.cell
@@ -94,7 +102,7 @@ def _(requests):
             timeout=10,).json() 
         towns = first_reply["items"] 
         pages = first_reply["pagination"]["pages"] 
-    
+
         for page in range(2, pages + 1): 
             page_reply = requests.get( 
                 "https://oim.zhili.dev/ma/towns", 
@@ -118,7 +126,7 @@ def _(county, get_towns):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## The Work.
+    ## 4. The Work.
 
     Your functions, and the code that uses them.
     """)
@@ -156,9 +164,10 @@ def _(
         if history is None:
             continue
         familyValue = history["average_single_family_value_dollars"]
+        rate = history["residential_rate_per_thousand"]
         bill = history["average_single_family_bill_dollars"]
         if familyValue <= budget_dollars and bill <= tax_limit_dollars:
-            matchingTowns.append({"name": town["name"], "value": familyValue, "bill": bill})
+            matchingTowns.append({"town": town["name"], "average home value": familyValue, "residential tax rate": rate, "average bill": bill})
 
     len(matchingTowns)
     return (matchingTowns,)
@@ -166,20 +175,20 @@ def _(
 
 @app.function
 def get_bill(town):
-    return town["bill"]
+    return town["average bill"]
 
 
 @app.cell
 def _(matchingTowns):
     matchTownsSort = sorted(matchingTowns, key=get_bill)
     matchTownsSort
-    return
+    return (matchTownsSort,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ##The Answer.
+    ## 5. The Answer.
 
     Your result table, printed with print and f-strings with the columns lined up, and **one sentence that answers the question in section 1** with the numbers in it.
 
@@ -188,12 +197,78 @@ def _(mo):
     return
 
 
+@app.cell
+def _(matchTownsSort):
+    for towns in matchTownsSort:
+        print(f"{towns["town"]:<15}Avg Home Value: {towns["average home value"]:>7}       Residential Tax Rate: {towns["residential tax rate"]:>6}             Avg Bill: {towns["average bill"]:>5}")
+    
+    return
+
+
+@app.cell
+def _(budget_dollars, county, matchTownsSort):
+    cheaptestTown = matchTownsSort[0]
+    print(f"For a homebuyer who wants a home in {county} with a budget of ${budget_dollars:,}, the town with the lowest average tax bill of ${cheaptestTown['average bill']:,} is {cheaptestTown['town']}.")
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## How I Know These Numbers Are Right.
+    ## 6.  How I Know These Numbers Are Right.
 
     Reach at least one result a second way, in this notebook, and show that the two agree. Write a cell that gets the same number from other fields, or open the raw reply in your browser and find each number of one row of your table there. For instance: an average bill is close to the average value times the tax rate divided by 1,000; an order's total equals the sum of its lines; the number of records you collected equals the total the API reports. At least one of those checks runs as code, and shows both numbers.
+    """)
+    return
+
+
+@app.cell
+def _(requests):
+    def get_towns_check(county, name ): 
+        first_reply = requests.get( 
+            "https://oim.zhili.dev/ma/towns", 
+            params={"county": county, "per_page": 100}, 
+            timeout=10,).json() 
+        
+        towns = first_reply["items"] 
+        for town in towns:
+            if town["name"] == name:
+                return town
+        return None
+
+    return (get_towns_check,)
+
+
+@app.cell
+def _(get_towns_check):
+    get_towns_check('Middlesex', 'Malden')
+
+
+    return
+
+
+@app.cell
+def _(requests):
+    def dor_code_check(dor_code):
+        town_reply = requests.get(
+            f"https://oim.zhili.dev/ma/towns/{dor_code}",
+            timeout=10,
+        ).json()
+        return town_reply
+
+    return (dor_code_check,)
+
+
+@app.cell
+def _(dor_code_check):
+    dor_code_check("165")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    I checked my numbers by defining a new variable called get_towns_check() where I took the data from /ma/towns and then passed Middlesex and Malden through it to get its information. From there, I made another def function with the /ma/towns/{dor_code} to get the latest finanes information for a specific dor_code. Then, I used the dor code from Malden (165) to get the information from the API and saw that the Average Home Value was $434420, the Residential Tax Rate was 11.4 (per thousand) and the Average Single Family Bill was $4952 which are all consistent with the above outputs I got.
     """)
     return
 
@@ -205,6 +280,11 @@ def _(mo):
 
     Pick one piece of AI output you did not accept as-is. What did it give you, what did you change, and how did you know? Point to the commit or the cell. If the agent got it right the first time: What did you do to verify that? Pointing to your check in section 6 is enough.
     """)
+    return
+
+
+@app.cell
+def _():
     return
 
 
