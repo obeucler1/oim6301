@@ -19,7 +19,7 @@ def _():
     import polars as pl
     import requests
 
-    return
+    return (requests,)
 
 
 @app.cell(hide_code=True)
@@ -76,6 +76,45 @@ def _(mo):
     return
 
 
+@app.cell
+def _():
+    county = "Middlesex" 
+    budget_dollars = 700000 
+    tax_limit_dollars = 8000 
+    fiscal_year = 2026 
+    return budget_dollars, county, fiscal_year, tax_limit_dollars
+
+
+@app.cell
+def _(requests):
+    def get_towns(county): 
+        first_reply = requests.get( 
+            "https://oim.zhili.dev/ma/towns", 
+            params={"county": county, "per_page": 100}, 
+            timeout=10,).json() 
+        towns = first_reply["items"] 
+        pages = first_reply["pagination"]["pages"] 
+    
+        for page in range(2, pages + 1): 
+            page_reply = requests.get( 
+                "https://oim.zhili.dev/ma/towns", 
+                params={"county": county, "per_page": 100, "page": page}, 
+                timeout=10, 
+            ).json() 
+            for town in page_reply["items"]: 
+                towns.append(town) 
+        return towns 
+
+    return (get_towns,)
+
+
+@app.cell
+def _(county, get_towns):
+    ma_towns = get_towns(county) 
+    len(ma_towns) 
+    return (ma_towns,)
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -83,6 +122,57 @@ def _(mo):
 
     Your functions, and the code that uses them.
     """)
+    return
+
+
+@app.cell
+def _(requests):
+    def get_town_history(dor_code, fiscal_year): 
+        """Returns one town's finances for one fiscal year, or None if there is no record for that year.""" 
+        history_reply = requests.get( 
+            f"https://oim.zhili.dev/ma/towns/{dor_code}/history", 
+            params={"from_year": fiscal_year, "to_year": fiscal_year}, 
+            timeout=10, 
+        ).json() 
+        years = history_reply["years"] 
+        if len(years) == 0: 
+            return None 
+        return years[0] 
+
+    return (get_town_history,)
+
+
+@app.cell
+def _(
+    budget_dollars,
+    fiscal_year,
+    get_town_history,
+    ma_towns,
+    tax_limit_dollars,
+):
+    matchingTowns = []
+    for town in ma_towns:
+        history = get_town_history(town["dor_code"], fiscal_year)
+        if history is None:
+            continue
+        familyValue = history["average_single_family_value_dollars"]
+        bill = history["average_single_family_bill_dollars"]
+        if familyValue <= budget_dollars and bill <= tax_limit_dollars:
+            matchingTowns.append({"name": town["name"], "value": familyValue, "bill": bill})
+
+    len(matchingTowns)
+    return (matchingTowns,)
+
+
+@app.function
+def get_bill(town):
+    return town["bill"]
+
+
+@app.cell
+def _(matchingTowns):
+    matchTownsSort = sorted(matchingTowns, key=get_bill)
+    matchTownsSort
     return
 
 
