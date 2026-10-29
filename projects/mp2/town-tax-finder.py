@@ -14,12 +14,9 @@ def _():
 @app.cell
 def _():
     import csv
-
-    import altair as alt
-    import polars as pl
     import requests
 
-    return (requests,)
+    return csv, requests
 
 
 @app.cell(hide_code=True)
@@ -406,6 +403,32 @@ def _(mo):
     mo.md(r"""
     Yes, the order does change because the towns with the lowest average bill do not necessarily have the lowest tax rates. Malden has the lowest average bill, but Dracut has the lowest residential tax rate.
     """)
+    return
+
+
+@app.cell
+def _(csv, fiscal_year, get_town_history, ma_towns):
+    allTowns = []
+    skippedCount = 0
+    for t in ma_towns:
+        hist = get_town_history(t["dor_code"], fiscal_year)
+        if hist is None:
+            skippedCount = skippedCount + 1
+            continue
+        allTowns.append({
+            "town": t["name"],
+            "average home value": hist["average_single_family_value_dollars"],
+            "residential tax rate": hist["residential_rate_per_thousand"],
+            "average bill": hist["average_single_family_bill_dollars"],
+        })
+
+    with open("all_towns.csv", "w", newline="") as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=["town", "average home value", "residential tax rate", "average bill"])
+        writer.writeheader()
+        for row in allTowns:
+            writer.writerow(row)
+
+    print(f"Wrote {len(allTowns)} towns to all_towns.csv.")
     return
 
 
