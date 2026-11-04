@@ -239,6 +239,22 @@ def _(mo):
     return
 
 
+@app.cell
+def _(database, duckdb):
+    with duckdb.connect(database) as _con:
+        _con.execute("""
+            CREATE TABLE town_bills (
+                name                               VARCHAR REFERENCES towns(name),
+                fiscal_year                        INTEGER NOT NULL,
+                average_single_family_bill_dollars INTEGER CHECK (average_single_family_bill_dollars >= 0),
+                PRIMARY KEY (name, fiscal_year)
+            )
+        """)
+        _con.execute("INSERT INTO town_bills VALUES ('Wellesley', 2022, 11200)")
+        _con.execute("INSERT INTO town_bills VALUES ('Wellesley', 2023, 11700)")
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -276,7 +292,38 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(database, duckdb):
+    try:
+        with duckdb.connect(database) as _con:
+            _con.execute("INSERT INTO towns VALUES ('Andover', 'Essex', 10, 0, 0)")
+        refusedd = "accepted"
+    except duckdb.ConstraintException as _error:
+        refusedd = str(_error).splitlines()[0]
+    refusedd
+    return
+
+
+@app.cell
+def _(database, duckdb):
+    try:
+        with duckdb.connect(database) as _con:
+            _con.execute("INSERT INTO towns VALUES ('Nowhere', 'Essex', 0, 0, 0)")
+        refuseddd = "accepted"
+    except duckdb.ConstraintException as _error:
+        refuseddd = str(_error).splitlines()[0]
+    refuseddd
+    return
+
+
+@app.cell
+def _(database, duckdb):
+    try:
+        with duckdb.connect(database) as _con:
+            _con.execute("INSERT INTO towns VALUES ('Nowhere', 'Nowhere', 10, 0, 0)")
+        refusedddd = "accepted"
+    except duckdb.ConstraintException as _error:
+        refusedddd = str(_error).splitlines()[0]
+    refusedddd
     return
 
 
