@@ -10,7 +10,7 @@
 
 import marimo
 
-__generated_with = "0.25.2"
+__generated_with = "0.24.2"
 app = marimo.App(width="medium", sql_output="polars")
 
 
@@ -144,16 +144,16 @@ def _(duckdb, mo):
             )
         """)
         _con.execute("""
-            CREATE TABLE towns (
+            CREATE TABLE towns (    
                 name                               VARCHAR PRIMARY KEY,
-                county                             VARCHAR NOT NULL REFERENCES counties(name),
+                county                             VARCHAR NOT NULL REFERENCES counties(name),             
                 population                         INTEGER NOT NULL CHECK (population > 0),
                 income_per_capita_dollars          INTEGER,
                 average_single_family_bill_dollars INTEGER CHECK (average_single_family_bill_dollars >= 0)
             )
         """)
         _con.execute("""
-            INSERT INTO counties
+            INSERT INTO counties           
             SELECT name, fips_code, towns, population, founded_year, government_abolished_year
             FROM county_rows
         """)
@@ -169,6 +169,15 @@ def _(duckdb, mo):
     database = _file
     database.name
     return (database,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    NOTES:
+    - create the table (lines 7-14 & 17-23), add values into table (lines 26-28)
+    """)
+    return
 
 
 @app.cell(hide_code=True)
@@ -191,6 +200,21 @@ def _(database, duckdb):
 @app.cell
 def _(ask):
     ask("SELECT (SELECT count(*) FROM counties) AS counties, (SELECT count(*) FROM towns) AS towns")
+    return
+
+
+@app.cell
+def _(ask):
+    ask("SELECT * FROM counties")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    NOTES:
+    - make sure all the data got into the table (14 counties, 6 columns)
+    """)
     return
 
 
@@ -251,6 +275,11 @@ def _(mo):
     return
 
 
+@app.cell
+def _():
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -276,6 +305,17 @@ def _(ask):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    NOTES:
+    - if just SELECT, gives error because no place to select from
+    - with FROM towns, gives all information for all towns
+    - can make more specific with WHERE, ORDER BY, and LIMIT
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     ## ✏️ C · An Answer You Already Know
 
     In notebook 5, exercise B found the five towns of more than 50,000 people with the highest average bill, in polars. Ask the database the same question.
@@ -283,6 +323,27 @@ def _(mo):
     *Check yourself: Brookline, Newton, Cambridge, Somerville, Quincy.*
 
     **Going further.** Ask the same question of `counties` and `towns` together: which county is each of those five in, and what share of its county's people does each hold? That needs both tables at once, which the topic slides call a join.
+    """)
+    return
+
+
+@app.cell
+def _(ask):
+    ask("""
+        SELECT name, average_single_family_bill_dollars
+        FROM towns
+        WHERE population > 50000
+        ORDER BY average_single_family_bill_dollars DESC
+        LIMIT 5
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    NOTES:
+    - business question ex: what are the big towns who are super rich?
     """)
     return
 
