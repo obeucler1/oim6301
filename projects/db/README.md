@@ -4,15 +4,65 @@
 
 ```mermaid
 erDiagram
-  CUSTOMERS ||--o{ ORDERS : places
-  CUSTOMERS {
-    string customer_id PK
-    string company_name
-  }
-  ORDERS {
-    int order_id PK
-    string customer_id FK
-  }
+    MEMBERS {
+        int member_id PK
+        string first_name
+        string mobile_number
+        string email "optional"
+        date join_date
+        int points_balance
+    }
+
+    PRODUCTS {
+        int product_id PK
+        string name
+        string category "coffee, tea, food, or other"
+        decimal price
+        decimal cost
+        boolean is_available
+    }
+
+    OPTIONS {
+        int option_id PK
+        string name
+        decimal price
+        decimal cost
+    }
+
+    ORDERS {
+        int order_id PK
+        datetime ordered_at
+        int member_id FK "optional, null for non-members"
+        string channel "counter or app"
+    }
+
+    ORDER_LINES {
+        int line_id PK
+        int order_id FK
+        int product_id FK
+        int quantity
+        decimal price_charged "price on the day of sale"
+    }
+
+    LINE_OPTIONS {
+        int line_id PK, FK
+        int option_id PK, FK
+        decimal price_charged "price on the day of sale"
+    }
+
+    PAYMENTS {
+        int payment_id PK
+        int order_id FK
+        string method "cash, card, app, or points"
+        decimal amount
+    }
+
+    MEMBERS |o--o{ ORDERS : places
+    PRODUCTS ||--o{ ORDER_LINES : "sold as"
+    ORDERS ||--|{ ORDER_LINES : contains
+    ORDER_LINES ||--o{ LINE_OPTIONS : carries
+    OPTIONS ||--o{ LINE_OPTIONS : "appears on"
+    ORDERS ||--|{ PAYMENTS : "settled by"
 ```
 
 3. What One Row Means. One sentence for each table, in the way Northwind's would read: "One row of orders is one order placed by one customer."
