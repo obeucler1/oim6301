@@ -69,12 +69,17 @@ erDiagram
 
 3. What One Row Means. One sentence for each table, in the way Northwind's would read: "One row of orders is one order placed by one customer."
 
-- One row of `members` is one loyalty member signed up at Babson Bean.
-- One row of `products` is one item on the menu.
-- One row of `options` is one add-on a drink can carry.
-- One row of `orders` is one order placed by a customer, member or not.
-- One row of `order_lines` is one product on one order, with the quantity bought and the price charged that day.
-- One row of `line_options` is one option added to one order line, with the price charged that day.
-- One row of `payments` is one payment made toward one order.
+One row of `members` is one loyalty member signed up at Babson Bean.
+One row of `products` is one item on the menu.
+One row of `options` is one add-on a drink can carry.
+One row of `orders` is one order placed by a customer, member or not.
+One row of `order_lines` is one product on one order, with the quantity bought and the price charged that day.
+One row of `line_options` is one option added to one order line, with the price charged that day.
+One row of `payments` is one payment made toward one order.
 
 4. Design Choices. Four short answers, in your own words. Which key you chose where the business already had one, such as an email or a ticker, and why. Which relationships are optional, and what in the scenario tells you so. Which of the scenario's rules your tables cannot hold, and how you will check it instead. And one thing your agent proposed for the design that you changed or did not take, and why; if you designed it alone, one thing you checked in the ERD your agent drew.
+
+1. Members already have a phone number and email in the dataset, but these aspects can change. The Key I chose was member_id in MEMBER. I chose this because aspects like email and phone number of customer may change, but a unique member ID will never change.
+2. member_id in ORDERS is optional because customers who are not members can also buy coffee at the shop, so if they do not have a loyalty membership their order name will just be blank or no customer. Since it is possible for a member to join the loyalty program but never actually order, the MEMBERS to ORDERS relationship is also optional. ORDER_LINES to LINE_OPTIONS is also optional since a line can have many options or no options.
+3. 
+
