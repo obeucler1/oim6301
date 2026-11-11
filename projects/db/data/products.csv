@@ -1,0 +1,25 @@
+product_id,name,category,price,cost,is_available
+1,Drip Coffee,coffee,1.7,0.91,true
+2,Americano,coffee,2.12,1.09,true
+3,Latte,coffee,4.25,1.66,true
+4,Cappuccino,coffee,3.98,1.61,false
+5,Cortado,coffee,4.0,1.64,true
+6,Mocha,coffee,4.61,1.8,true
+7,Espresso Shot,coffee,2.05,0.76,true
+8,Cold Brew,coffee,3.14,1.33,true
+9,Iced Latte,coffee,3.65,1.52,true
+10,Green Tea,tea,2.2,0.81,true
+11,Black Tea,tea,1.95,0.76,true
+12,Chai Latte,tea,2.61,1.24,true
+13,Matcha Latte,tea,3.92,1.74,true
+14,Herbal Tea,tea,2.22,0.82,true
+15,Croissant,food,2.88,1.42,true
+16,Blueberry Muffin,food,2.35,1.35,true
+17,Bagel with Cream Cheese,food,2.73,1.64,false
+18,Avocado Toast,food,4.95,3.1,true
+19,Granola Yogurt Cup,food,3.56,2.26,true
+20,Breakfast Sandwich,food,5.04,3.07,true
+21,Chocolate Chip Cookie,food,2.53,1.17,true
+22,Bottled Water,other,1.24,0.6,true
+23,Babson Bean Mug,other,8.46,4.86,true
+24,Bag of Whole Bean Coffee,other,10.75,6.49,true
