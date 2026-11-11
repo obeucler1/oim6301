@@ -477,7 +477,7 @@ def _(ask):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    The sum has to equal the number of rows in towns because each county counts all of the towns in it, so the sum of all the towns is the total number of rows in towns.
+    The sum is 351 which is the number of rows in town. The sum has to equal the number of rows in towns because each county counts all of the towns in it, so the sum of all the towns is the total number of rows in towns.
     """)
     return
 

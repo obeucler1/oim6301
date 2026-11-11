@@ -10,7 +10,7 @@
 
 import marimo
 
-__generated_with = "0.25.2"
+__generated_with = "0.24.2"
 app = marimo.App(width="medium", sql_output="polars")
 
 
@@ -160,6 +160,15 @@ def _(ask, towns_database):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    ##NOTES
+    - JOIN is inner join
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     Boston has 673,458 people, and Suffolk County, where it is, has 793,144. In this query, `t` and `c` are short names for the two tables, called **table aliases**. They make it clear that `t.population` is a town's population and `c.population` is a county's.
 
     On TV shows: [The four shows, with `JOIN`](https://oim-shows.zhili.dev/queries#join-inner)
@@ -226,12 +235,12 @@ def _(mo):
 @app.cell
 def _(ask, towns_database):
     ask(towns_database, """
-        SELECT c.name
+        SELECT c.name, t.name, t.average_single_family_bill_dollars
         FROM counties AS c
-        LEFT JOIN towns AS t
+        JOIN towns AS t
             ON t.county = c.name AND t.average_single_family_bill_dollars > 15000
-        WHERE t.name IS NULL
-        ORDER BY c.name
+        -- WHERE t.name IS NOT NULL
+        ORDER BY t.average_single_family_bill_dollars DESC 
     """)
     return
 
@@ -389,6 +398,18 @@ def _(mo):
     *Check yourself: Beverages first, with about 13,375,939, and all eight, added before rounding, give 63,856,337.63.*
 
     **Going further.** Compute revenue by category for each year, and find the category that grew the most.
+    """)
+    return
+
+
+@app.cell
+def _(ask, northwind_database):
+    ask(northwind_database, """
+    SELECT count(*) from OrderID
+
+
+
+
     """)
     return
 
@@ -562,6 +583,19 @@ def _(mo):
     - [ ] I can check a key for repeats before I join on it, and explain why a total grows after a join
     - [ ] I can join three tables and check the result against a total I know
     - [ ] I can connect to a database on a server and ask it the same questions in T-SQL
+    """)
+    return
+
+
+@app.cell
+def _(ask, northwind_database):
+    ask(northwind_database, """
+        SELECT p.ProductName, count(*) AS number_of_orders
+        FROM order_details AS d
+        JOIN products AS p ON p.ProductID = d.ProductID
+        GROUP BY p.ProductName
+        ORDER BY number_of_orders DESC
+        LIMIT 10
     """)
     return
 
