@@ -37,21 +37,17 @@ def _(mo):
     mo.md(r"""
     # 3. Reading It Back
 
-    **The question I picked, before answering any of them:** *For each coffee and tea product, the average number of options on its lines, counting a line with no options as zero.* It needs three tables: `products`, `order_lines` and `line_options`.
+    ** *For each coffee and tea product, the average number of options on its lines, counting a line with no options as zero.* It needs 3 tables: `products`, `order_lines` and `line_options`.
 
-    **My prediction, committed as `db: prediction` before running this query:**
+    **My prediction**
 
-    The query joins `products` (kept to `category IN ('coffee', 'tea')`) to `order_lines` on `product_id`, then `LEFT JOIN`s `line_options` on `line_id`, all before any `GROUP BY`. A `LEFT JOIN` keeps one row for an order line with no options, and one row per option for a line that has some, so each order line turns into `max(1, number of its options)` rows.
+    The query would join `products` (kept to `category IN ('coffee', 'tea')`) to `order_lines` on `product_id`, then `LEFT JOIN`s `line_options` on `line_id`, all before any `GROUP BY`. A `LEFT JOIN` keeps one row for an order line with no options, and one row per option for a line that has some, so each order line turns into `max(1, number of its options)` rows.
 
-    From Part A I already know:
+    I know from part A that:
 
-    - `order_lines` has 2,956 rows in total.
-    - `make_data.py` picks each line's product uniformly from the 22 products that ever get ordered (24 products minus the 2 that `make_data.py` deliberately never orders), and both of those 2 unused products are in the `other` category, not `coffee` or `tea`. So all 9 coffee and 5 tea products (14 of the 22 orderable products) do appear in `order_lines`.
-    - `make_data.py` gives each line 0 options with probability 0.5, 1 option with probability 0.35, and 2 options with probability 0.15, so `max(1, options)` averages to `0.5(1) + 0.35(1) + 0.15(2) = 1.15` rows per line.
+    `order_lines` has 2,956 rows, `make_data.py` takes each line's product from the 22 products that ever get ordered, and both of those 2 unused products are in the `other` category, they arent `coffee` or `tea`. So all 9 coffee and 5 tea products show in `order_lines`, and that  `make_data.py` gives each line 0 options with probability 0.5, 1 option with probability 0.35, and 2 options with probability 0.15, so `max(1, options)` averages to `0.5(1) + 0.35(1) + 0.15(2) = 1.15` rows per line.
 
-    Putting that together: about `2,956 × 14/22 ≈ 1,881` of the order lines are for a coffee or tea product, and the left join turns each of those into about 1.15 rows on average, so **I predict about `1,881 × 1.15 ≈ 2,163` rows before any grouping.**
-
-    *(The rest of this section — running the joins, counting the rows, and what one row of the final result means — comes after I answer all 10 questions.)*
+    This means that about `2,956 × 14/22 ≈ 1,881` of the order lines are for a coffee or tea, and the left join turns each of those into about 1.15 rows, so **I predict about `1,881 × 1.15 ≈ 2,163` rows before any grouping.**
     """)
     return
 
