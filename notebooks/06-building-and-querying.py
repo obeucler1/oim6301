@@ -482,6 +482,20 @@ def _(mo):
     return
 
 
+@app.cell
+def _(ask):
+    ask("""
+        SELECT county,
+            sum(population) AS total_population,
+            sum(CASE WHEN average_single_family_bill_dollars > 10000 THEN population ELSE 0 END) AS high_bill_population,
+            round(100.0 * sum(CASE WHEN average_single_family_bill_dollars > 10000 THEN population ELSE 0 END) / sum(population), 1) AS high_bill_share_pct
+        FROM towns
+        GROUP BY county
+        ORDER BY high_bill_share_pct DESC
+    """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -540,6 +554,23 @@ def _(mo):
     2. For each country, the number of orders and the total of `Freight`, the most freight first. *Check yourself: USA with 2,328 orders and 573,251 in freight, then Germany with 2,193 and 537,189.75, then France with 1,778 and 442,055.75.*
 
     **Going further.** Rank the countries by freight per order instead, and see which countries move.
+    """)
+    return
+
+
+@app.cell
+def _(ask, orders_file):
+    ask(f"SELECT count(DISTINCT ShipCountry) AS countries FROM '{orders_file}'")
+    return
+
+
+@app.cell
+def _(ask, orders_file):
+    ask(f"""
+        SELECT ShipCountry, count(*) AS orders, sum(Freight) AS total_freight
+        FROM '{orders_file}'
+        GROUP BY ShipCountry
+        ORDER BY total_freight DESC
     """)
     return
 
