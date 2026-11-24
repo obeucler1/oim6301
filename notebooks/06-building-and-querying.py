@@ -516,8 +516,6 @@ def _(ask):
 def _(mo):
     mo.md(r"""
     It returns the same rows as section 4's first query. In your database project, save the question the business asks every week the same way, in the cell that builds your database.
-
-    Full reference: [SQL §28](/handbooks/sql/04-building-and-loading/#28-views)
     """)
     return
 
@@ -544,7 +542,7 @@ def _(ask, mo, requests):
         _path.write_bytes(_reply.content)
     orders_file = _path.as_posix()
     ask(f"SELECT count(*) AS orders FROM '{orders_file}'")
-    return
+    return (orders_file,)
 
 
 @app.cell(hide_code=True)
