@@ -220,6 +220,39 @@ def _(mo):
     return
 
 
+@app.cell
+def _(ask, towns_database):
+    ask(towns_database, """
+        SELECT t.name, t.county, t.population, c.population AS county_population
+        FROM towns AS t
+        JOIN counties AS c ON t.county = c.name
+        ORDER BY t.population DESC
+    """)
+    return
+
+
+@app.cell
+def _(ask, towns_database):
+    ask(towns_database, """
+    SELECT t.name, t.county, t.population, c.population AS county_population,
+           round(100.0 * t.population / c.population, 1) AS share_pct
+    FROM towns AS t
+    JOIN counties AS c ON t.county = c.name
+    ORDER BY share_pct DESC
+    LIMIT 5
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    1. The count is 351 because towns.county is an FK from counties.name, which is every town's county value is required to exist in counties, so each of the 351 towns matches exactly one row in counties. The JOIN doesnt drop a town or duplicates one, so it has exactly one row per town which makes 351.
+    2. Nantuckets share is exactly 100 because its the only town in nantuckets county, so everyone in the population is also in the county population so its 100%
+    """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -278,6 +311,17 @@ def _(mo):
 
     **Going further.** List the employees with the number of territories each covers, and check that the counts add up to the rows of `employee_territories`. Then find the same four territories with `WHERE NOT EXISTS (...)`.
     """)
+    return
+
+
+@app.cell
+def _(ask, northwind_database):
+    ask(northwind_database, """
+            SELECT t.TerritoryID, t.TerritoryDescription
+            FROM territories AS t
+            LEFT JOIN employee_territories AS et ON et.TerritoryID = t.TerritoryID
+            WHERE et.TerritoryID IS NULL
+        """)
     return
 
 
@@ -382,6 +426,17 @@ def _(mo):
     return
 
 
+@app.cell
+def _(ask, northwind_database):
+    ask(northwind_database, """
+            SELECT ShipCountry, sum(Freight) AS total_freight
+            FROM orders
+            GROUP BY ShipCountry
+            ORDER BY total_freight DESC
+        """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -405,11 +460,26 @@ def _(mo):
 @app.cell
 def _(ask, northwind_database):
     ask(northwind_database, """
-    SELECT count(*) from OrderID
+        SELECT cat.CategoryName,
+               sum(d.UnitPrice * d.Quantity * (1 - d.Discount)) AS revenue
+        FROM order_details AS d
+        JOIN orders AS o ON o.OrderID = d.OrderID
+        JOIN products AS p ON p.ProductID = d.ProductID
+        JOIN categories AS cat ON cat.CategoryID = p.CategoryID
+        WHERE o.ShipCountry = 'USA'
+        GROUP BY cat.CategoryName
+        ORDER BY revenue DESC
+    """)
+    return
 
 
-
-
+@app.cell
+def _(ask, northwind_database):
+    ask(northwind_database, """
+        SELECT sum(d.UnitPrice * d.Quantity * (1 - d.Discount)) AS usa_revenue
+        FROM order_details AS d
+        JOIN orders AS o ON o.OrderID = d.OrderID
+        WHERE o.ShipCountry = 'USA'
     """)
     return
 
