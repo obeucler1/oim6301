@@ -556,6 +556,61 @@ def _(mo):
     return
 
 
+@app.cell
+def _(ask_server):
+    ask_server("""
+        SELECT
+            (SELECT COUNT(*) FROM Sales.SalesOrderHeader) AS header_rows,
+            (SELECT COUNT(*) FROM Sales.SalesOrderDetail) AS detail_rows,
+            (SELECT COUNT(*)
+             FROM Sales.SalesOrderHeader AS h
+             JOIN Sales.SalesOrderDetail AS d ON d.SalesOrderID = h.SalesOrderID) AS joined_rows
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    The join has exactly as many rows as `Sales.SalesOrderDetail`, because `SalesOrderID` in `Sales.SalesOrderDetail` is a foreign key to `Sales.SalesOrderHeader`: every line names exactly one order that exists, so each of the 121,317 lines matches exactly one header row, and the join neither drops nor repeats a line.
+    """)
+    return
+
+
+@app.cell
+def _(ask_server):
+    ask_server("""
+        SELECT
+            (SELECT SUM(Freight) FROM Sales.SalesOrderHeader) AS total_freight,
+            (SELECT SUM(h.Freight)
+             FROM Sales.SalesOrderHeader AS h
+             JOIN Sales.SalesOrderDetail AS d ON d.SalesOrderID = h.SalesOrderID) AS freight_after_the_join
+    """)
+    return
+
+
+@app.cell
+def _(ask_server):
+    ask_server("""
+        SELECT COUNT(*) AS customers_never_ordered
+        FROM Sales.Customer AS c
+        LEFT JOIN Sales.SalesOrderHeader AS h ON h.CustomerID = c.CustomerID
+        WHERE h.SalesOrderID IS NULL
+    """)
+    return
+
+
+@app.cell
+def _(ask_server):
+    ask_server("""
+        SELECT COUNT(*) AS products_never_sold
+        FROM Production.Product AS p
+        LEFT JOIN Sales.SalesOrderDetail AS d ON d.ProductID = p.ProductID
+        WHERE d.SalesOrderDetailID IS NULL
+    """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
